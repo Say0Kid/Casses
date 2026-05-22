@@ -1,249 +1,782 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forklift Master CACES 1A/1B</title>
-    <style>
-        :root {
-            --primary: #fbc531;
-            --danger: #e84118;
-            --success: #4cd137;
-            --dark: #2f3640;
-        }
-        body {
-            margin: 0;
-            background: #1e272e;
-            font-family: 'Segoe UI', sans-serif;
-            color: white;
-            display: flex;
-            justify-content: center;
-            touch-action: manipulation;
-        }
-        .game-container {
-            width: 100%;
-            max-width: 500px;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .lives { color: var(--danger); font-size: 1.2rem; }
-        .stats-top { text-align: right; font-size: 0.9rem; color: #aaa; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forklift Master CACES 1A/1B</title>
+  <style>
+    :root {
+      --primary: #fbc531;
+      --danger: #e84118;
+      --success: #4cd137;
+      --dark: #2f3640;
+    }
 
-        /* ZONE VISUELLE */
-        .viewport {
-            height: 220px;
-            background: linear-gradient(#3d3d3d, #222);
-            border: 3px solid var(--primary);
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        /* Sol */
-        .ground {
-            position: absolute;
-            bottom: 0; width: 100%; height: 30px;
-            background: #444; border-top: 2px solid #555;
-        }
+    body {
+      margin: 0;
+      background: #1e272e;
+      font-family: "Segoe UI", sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      touch-action: manipulation;
+    }
 
-        /* Chariot Réaliste */
-        .chariot-body {
-            position: absolute;
-            bottom: 30px; left: 40px;
-            width: 90px; height: 60px;
-            background: var(--primary);
-            border-radius: 10px 15px 5px 5px;
-            z-index: 2;
-        }
-        .wheel {
-            position: absolute;
-            bottom: -10px; width: 25px; height: 25px;
-            background: #111; border-radius: 50%; border: 3px solid #333;
-        }
-        .w1 { left: 5px; } .w2 { right: 5px; }
-        .mast {
-            position: absolute;
-            bottom: 30px; left: 130px;
-            width: 10px; height: 160px;
-            background: #7f8c8d; border-radius: 2px;
-        }
-        /* Les Fourches */
-        .forks {
-            position: absolute;
-            bottom: 35px; left: 130px;
-            width: 100px; height: 6px;
-            background: #bdc3c7;
-            transition: 0.5s ease;
-            z-index: 3;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-        }
-        .forks::before { /* Dos de la fourche */
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0;
-            width: 6px; height: 40px;
-            background: #bdc3c7;
-        }
-        /* La Palette */
-        .palette {
-            position: absolute;
-            bottom: 6px; left: 6px;
-            background: #d35400;
-            border: 2px solid #a04000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px; font-weight: bold;
-        }
+    .game-container {
+      width: 100%;
+      max-width: 520px;
+      padding: 15px;
+      box-sizing: border-box;
+    }
 
-        /* INFOS ET BOUTONS */
-        .mission-card {
-            background: #353b48;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .data-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-        .data-item {
-            background: #2f3640;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .data-item span { display: block; font-size: 0.8rem; color: #999; }
-        .data-item b { font-size: 1.1rem; color: var(--primary); }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
 
-        .btn-group {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-        }
-        button {
-            padding: 18px; border: none; border-radius: 8px;
-            font-size: 1.1rem; font-weight: bold; color: white;
-            cursor: pointer; transition: 0.2s;
-        }
-        .btn-ok { background: var(--success); }
-        .btn-stop { background: var(--danger); }
-        button:active { transform: scale(0.95); }
-    </style>
+    .lives {
+      color: var(--danger);
+      font-size: 1.2rem;
+    }
+
+    .stats-top {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    /* ZONE VISUELLE */
+    .viewport {
+      height: 220px;
+      background: linear-gradient(#3d3d3d, #222);
+      border: 3px solid var(--primary);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    /* Sol */
+    .ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 30px;
+      background: #444;
+      border-top: 2px solid #555;
+    }
+
+    /* Chariot */
+    .chariot-body {
+      position: absolute;
+      bottom: 30px;
+      left: 40px;
+      width: 90px;
+      height: 60px;
+      background: var(--primary);
+      border-radius: 10px 15px 5px 5px;
+      z-index: 2;
+    }
+
+    .wheel {
+      position: absolute;
+      bottom: -10px;
+      width: 25px;
+      height: 25px;
+      background: #111;
+      border-radius: 50%;
+      border: 3px solid #333;
+    }
+
+    .w1 {
+      left: 5px;
+    }
+
+    .w2 {
+      right: 5px;
+    }
+
+    .mast {
+      position: absolute;
+      bottom: 30px;
+      left: 130px;
+      width: 10px;
+      height: 160px;
+      background: #7f8c8d;
+      border-radius: 2px;
+    }
+
+    /* Fourches */
+    .forks {
+      position: absolute;
+      bottom: 35px;
+      left: 130px;
+      width: 100px;
+      height: 6px;
+      background: #bdc3c7;
+      transition: 0.5s ease;
+      z-index: 3;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .forks::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 6px;
+      height: 40px;
+      background: #bdc3c7;
+    }
+
+    /* Palette */
+    .palette {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+      background: #d35400;
+      border: 2px solid #a04000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    /* Cartes / écrans */
+    .card {
+      background: #353b48;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .data-item {
+      background: #2f3640;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .data-item span {
+      display: block;
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    .data-item b {
+      font-size: 1.1rem;
+      color: var(--primary);
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      padding: 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-ok {
+      background: var(--success);
+    }
+
+    .btn-stop {
+      background: var(--danger);
+    }
+
+    .btn-dark {
+      background: #2f3640;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .muted {
+      color: #b7b7b7;
+      font-size: 0.9rem;
+      margin: 8px 0 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.95rem;
+    }
+
+    th {
+      color: #ddd;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    td {
+      color: #f1f1f1;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(251, 197, 49, 0.15);
+      border: 1px solid rgba(251, 197, 49, 0.35);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .error {
+      color: #ffb3a8;
+      background: rgba(232, 65, 24, 0.15);
+      border: 1px solid rgba(232, 65, 24, 0.35);
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    .ok {
+      color: #c9ffd1;
+      background: rgba(76, 209, 55, 0.15);
+      border: 1px solid rgba(76, 209, 55, 0.35);
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .small {
+      font-size: 0.85rem;
+      color: #bbb;
+      line-height: 1.35;
+    }
+  </style>
 </head>
 <body>
-
-<div class="game-container">
+  <div class="game-container">
     <div class="header">
-        <div class="lives" id="lifeContainer">❤️❤️❤️❤️❤️</div>
-        <div class="stats-top">
-            Score: <b id="score">0</b> | Top: <b id="topScore">0</b>
-        </div>
+      <div class="lives" id="lifeContainer">❤️❤️❤️❤️❤️</div>
+      <div class="stats-top">
+        Score: <b id="score">0</b> | Top: <b id="topScore">0</b>
+      </div>
     </div>
 
-    <div class="viewport">
+    <!-- HOME -->
+    <div class="screen active" id="screenHome">
+      <div class="card">
+        <h2 style="margin: 0">Forklift Master</h2>
+        <p class="muted">CACES 1A/1B — Analyse de charge</p>
+        <div class="btn-row">
+          <button class="btn-ok" id="btnGoPlay">JOUER</button>
+          <button class="btn-dark" id="btnGoScores">MEILLEURS SCORES</button>
+        </div>
+        <p class="small" style="margin-top: 14px">
+          Mode en ligne via API (Cloudflare Worker). Si l’API n’est pas configurée, le jeu fonctionne
+          quand même mais les scores restent en local.
+        </p>
+        <div id="homeApiStatus"></div>
+      </div>
+    </div>
+
+    <!-- GAME -->
+    <div class="screen" id="screenGame">
+      <div class="viewport">
         <div class="ground"></div>
         <div class="chariot-body">
-            <div class="wheel w1"></div>
-            <div class="wheel w2"></div>
+          <div class="wheel w1"></div>
+          <div class="wheel w2"></div>
         </div>
         <div class="mast"></div>
         <div class="forks" id="forksUI">
-            <div class="palette" id="paletteUI"></div>
+          <div class="palette" id="paletteUI"></div>
         </div>
-    </div>
+      </div>
 
-    <div class="mission-card">
-        <h3 style="margin:0">ANALYSE DE CHARGE</h3>
+      <div class="card">
+        <h3 style="margin: 0">ANALYSE DE CHARGE</h3>
         <div class="data-grid">
-            <div class="data-item"><span>Poids</span><b id="valPoids">--</b></div>
-            <div class="data-item"><span>Distance (CDG)</span><b id="valDist">--</b></div>
+          <div class="data-item"><span>Poids</span><b id="valPoids">--</b></div>
+          <div class="data-item"><span>Distance (CDG)</span><b id="valDist">--</b></div>
         </div>
-        <p style="font-size: 0.85rem; color: #ccc;">Limite Chariot : <b>600 000</b> kg.mm</p>
-        
-        <div class="btn-group">
-            <button class="btn-ok" onclick="decide(true)">VALIDER</button>
-            <button class="btn-stop" onclick="decide(false)">REFUSER</button>
-        </div>
-    </div>
-</div>
+        <p style="font-size: 0.85rem; color: #ccc">
+          Limite Chariot : <b>600 000</b> kg.mm
+        </p>
 
-<script>
+        <div class="btn-group">
+          <button class="btn-ok" onclick="decide(true)">VALIDER</button>
+          <button class="btn-stop" onclick="decide(false)">REFUSER</button>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-dark" id="btnBackHomeFromGame">← HOME</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCORES -->
+    <div class="screen" id="screenScores">
+      <div class="card">
+        <h3 style="margin: 0">TOP 10</h3>
+        <p class="muted">Classement en ligne (si configuré) + fallback local.</p>
+
+        <div class="btn-row">
+          <button class="btn-ok" id="btnRefreshScores">ACTUALISER</button>
+          <button class="btn-dark" id="btnBackHomeFromScores">← HOME</button>
+        </div>
+
+        <div id="scoresStatus"></div>
+
+        <table aria-label="Meilleurs scores">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Pseudo</th>
+              <th>Score</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="scoresTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GAME OVER / SUBMIT -->
+    <div class="screen" id="screenGameOver">
+      <div class="card">
+        <h3 style="margin: 0">PARTIE TERMINÉE</h3>
+        <p class="muted">Ton score : <span class="pill" id="finalScorePill">0</span></p>
+
+        <div id="submitBlock">
+          <p class="small">Entre ton pseudo pour enregistrer ton score dans le Top 10.</p>
+          <input type="text" id="pseudoInput" maxlength="16" placeholder="Ton pseudo" />
+          <div class="btn-row">
+            <button class="btn-ok" id="btnSubmitScore">ENVOYER LE SCORE</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-dark" id="btnShareScore">PARTAGER</button>
+          <button class="btn-ok" id="btnPlayAgain">REJOUER</button>
+          <button class="btn-dark" id="btnGoScoresFromGameOver">VOIR TOP 10</button>
+          <button class="btn-dark" id="btnBackHomeFromGameOver">← HOME</button>
+        </div>
+
+        <div id="gameOverStatus"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =============================
+    // CONFIG (Cloudflare Worker API)
+    // =============================
+    // IMPORTANT:
+    // - Remplace cette URL par l’URL de ton Worker (ex: https://caces-scores.<ton-compte>.workers.dev)
+    // - Endpoints attendus:
+    //    GET  /scores  -> [{ pseudo, score, createdAt }]
+    //    POST /scores  -> { pseudo, score }
+    const API_BASE = ""; // <-- À configurer
+
+    // =============================
+    // GAME STATE
+    // =============================
     let lives = 5;
     let score = 0;
-    let topScore = localStorage.getItem('topCaces') || 0;
-    let limit = 600000;
+    let topScore = Number(localStorage.getItem("topCaces")) || 0;
+    const limit = 600000;
     let curP = 0;
     let curD = 0;
 
-    document.getElementById('topScore').innerText = topScore;
+    document.getElementById("topScore").innerText = String(topScore);
 
-    function initLevel() {
-        if(lives <= 0) return gameOver();
+    // =============================
+    // UI helpers
+    // =============================
+    const screens = {
+      home: document.getElementById("screenHome"),
+      game: document.getElementById("screenGame"),
+      scores: document.getElementById("screenScores"),
+      gameOver: document.getElementById("screenGameOver"),
+    };
 
-        // Nouveaux paramètres
-        curP = Math.floor(Math.random() * 1200) + 400; // 400 à 1600kg
-        curD = Math.floor(Math.random() * 800) + 400;  // 400 à 1200mm
-
-        document.getElementById('valPoids').innerText = curP + " kg";
-        document.getElementById('valDist').innerText = curD + " mm";
-        
-        // Visuel
-        const pUI = document.getElementById('paletteUI');
-        const fUI = document.getElementById('forksUI');
-        
-        pUI.style.width = (curD / 10) + "px";
-        pUI.style.height = (curP / 25) + "px";
-        pUI.innerText = curP + "kg";
-        
-        // Animation : les fourches montent un peu aléatoirement pour le style
-        fUI.style.bottom = (Math.random() * 100 + 35) + "px";
+    function showScreen(name) {
+      Object.values(screens).forEach((el) => el.classList.remove("active"));
+      screens[name].classList.add("active");
     }
 
-    function decide(userSaysOk) {
-        let moment = curP * curD;
-        let safe = moment <= limit;
-
-        if (userSaysOk === safe) {
-            score++;
-            document.getElementById('score').innerText = score;
-        } else {
-            lives--;
-            updateLives();
-            alert(safe ? "Oups ! C'était stable." : "ACCIDENT ! Le chariot bascule !");
-        }
-
-        if(score > topScore) {
-            topScore = score;
-            localStorage.setItem('topCaces', topScore);
-            document.getElementById('topScore').innerText = topScore;
-        }
-
-        initLevel();
+    function setStatus(el, type, msg) {
+      if (!el) return;
+      if (!msg) {
+        el.innerHTML = "";
+        return;
+      }
+      el.innerHTML = `<div class="${type}">${msg}</div>`;
     }
 
     function updateLives() {
-        let lStr = "";
-        for(let i=0; i<5; i++) lStr += (i < lives) ? "❤️" : "🖤";
-        document.getElementById('lifeContainer').innerText = lStr;
+      let lStr = "";
+      for (let i = 0; i < 5; i++) lStr += i < lives ? "❤️" : "🖤";
+      document.getElementById("lifeContainer").innerText = lStr;
+    }
+
+    function resetGame() {
+      lives = 5;
+      score = 0;
+      document.getElementById("score").innerText = "0";
+      updateLives();
+    }
+
+    // =============================
+    // GAME LOGIC
+    // =============================
+    function initLevel() {
+      if (lives <= 0) return gameOver();
+
+      curP = Math.floor(Math.random() * 1200) + 400; // 400 à 1600kg
+      curD = Math.floor(Math.random() * 800) + 400; // 400 à 1200mm
+
+      document.getElementById("valPoids").innerText = curP + " kg";
+      document.getElementById("valDist").innerText = curD + " mm";
+
+      const pUI = document.getElementById("paletteUI");
+      const fUI = document.getElementById("forksUI");
+
+      pUI.style.width = curD / 10 + "px";
+      pUI.style.height = curP / 25 + "px";
+      pUI.innerText = curP + "kg";
+
+      fUI.style.bottom = Math.random() * 100 + 35 + "px";
+    }
+
+    function decide(userSaysOk) {
+      const moment = curP * curD;
+      const safe = moment <= limit;
+
+      if (userSaysOk === safe) {
+        score++;
+        document.getElementById("score").innerText = String(score);
+      } else {
+        lives--;
+        updateLives();
+        alert(safe ? "Oups ! C'était stable." : "ACCIDENT ! Le chariot bascule !");
+      }
+
+      if (score > topScore) {
+        topScore = score;
+        localStorage.setItem("topCaces", String(topScore));
+        document.getElementById("topScore").innerText = String(topScore);
+      }
+
+      initLevel();
+    }
+
+    // =============================
+    // ONLINE SCORES (API + fallback)
+    // =============================
+    const LS_TOP10_KEY = "top10Caces";
+
+    function getLocalTop10() {
+      try {
+        const arr = JSON.parse(localStorage.getItem(LS_TOP10_KEY) || "[]");
+        if (!Array.isArray(arr)) return [];
+        return arr
+          .filter((x) => x && typeof x.pseudo === "string" && typeof x.score === "number")
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 10);
+      } catch {
+        return [];
+      }
+    }
+
+    function saveLocalScore(pseudo, s) {
+      const existing = getLocalTop10();
+      existing.push({ pseudo, score: s, createdAt: new Date().toISOString() });
+      const next = existing.sort((a, b) => b.score - a.score).slice(0, 10);
+      localStorage.setItem(LS_TOP10_KEY, JSON.stringify(next));
+      return next;
+    }
+
+    async function apiHealthcheck() {
+      const el = document.getElementById("homeApiStatus");
+      if (!API_BASE) {
+        setStatus(
+          el,
+          "error",
+          "API non configurée. Configure <b>API_BASE</b> dans index.html pour activer les scores en ligne."
+        );
+        return false;
+      }
+      try {
+        const res = await fetch(API_BASE.replace(/\/$/, "") + "/scores", { method: "GET" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        setStatus(el, "ok", "API en ligne : scores partagés activés.");
+        return true;
+      } catch (e) {
+        setStatus(el, "error", "API injoignable. Les scores seront en local (fallback).");
+        return false;
+      }
+    }
+
+    async function fetchTop10() {
+      const scoresStatus = document.getElementById("scoresStatus");
+      setStatus(scoresStatus, null, "");
+
+      // Try API first
+      if (API_BASE) {
+        try {
+          const res = await fetch(API_BASE.replace(/\/$/, "") + "/scores");
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const data = await res.json();
+          if (!Array.isArray(data)) throw new Error("Bad JSON");
+          return data
+            .map((x) => ({
+              pseudo: String(x.pseudo || ""),
+              score: Number(x.score || 0),
+              createdAt: x.createdAt ? String(x.createdAt) : x.created_at ? String(x.created_at) : "",
+            }))
+            .filter((x) => x.pseudo && Number.isFinite(x.score))
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10);
+        } catch (e) {
+          setStatus(scoresStatus, "error", "Impossible de charger l’API. Affichage du Top 10 local.");
+        }
+      } else {
+        setStatus(scoresStatus, "error", "API non configurée. Affichage du Top 10 local.");
+      }
+
+      return getLocalTop10();
+    }
+
+    async function submitScore(pseudo, s) {
+      // API first
+      if (API_BASE) {
+        const url = API_BASE.replace(/\/$/, "") + "/scores";
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pseudo, score: s }),
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return true;
+      }
+
+      // fallback local
+      saveLocalScore(pseudo, s);
+      return false;
+    }
+
+    function renderScores(rows) {
+      const tbody = document.getElementById("scoresTableBody");
+      tbody.innerHTML = "";
+      rows.forEach((r, idx) => {
+        const tr = document.createElement("tr");
+        const dt = r.createdAt ? new Date(r.createdAt) : null;
+        const dateStr = dt && !isNaN(dt.valueOf()) ? dt.toLocaleDateString("fr-FR") : "";
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td>${escapeHtml(r.pseudo)}</td>
+          <td><span class="pill">${r.score}</span></td>
+          <td>${dateStr}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function isPseudoValid(p) {
+      const pseudo = (p || "").trim();
+      if (!pseudo) return false;
+      // autorise lettres, chiffres, underscore, tiret, espace
+      return /^[a-zA-Z0-9_\- ]{2,16}$/.test(pseudo);
     }
 
     function gameOver() {
-        alert("PARTIE TERMINÉE ! Score Final : " + score);
-        lives = 5;
-        score = 0;
-        document.getElementById('score').innerText = "0";
-        updateLives();
-        initLevel();
+      // show screen
+      document.getElementById("finalScorePill").innerText = String(score);
+      document.getElementById("pseudoInput").value = "";
+      setStatus(document.getElementById("gameOverStatus"), null, "");
+
+      showScreen("gameOver");
+
+      // reset internal for next play (but keep score value for submit)
+      // We reset only when user clicks replay/home.
     }
 
-    initLevel();
-</script>
+    // =============================
+    // SHARE
+    // =============================
+    async function shareScore() {
+      const text = `J’ai fait ${score} points sur Forklift Master CACES !`;
+      const url = location.href;
 
+      // Try native share
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Forklift Master", text, url });
+          return;
+        } catch {
+          // user cancelled
+        }
+      }
+
+      // fallback: copy to clipboard
+      const shareText = `${text} ${url}`;
+      try {
+        await navigator.clipboard.writeText(shareText);
+        setStatus(document.getElementById("gameOverStatus"), "ok", "Lien de partage copié dans le presse-papiers.");
+      } catch {
+        setStatus(
+          document.getElementById("gameOverStatus"),
+          "error",
+          "Impossible de copier automatiquement. Copie manuellement : " + escapeHtml(shareText)
+        );
+      }
+    }
+
+    // =============================
+    // EVENTS
+    // =============================
+    document.getElementById("btnGoPlay").addEventListener("click", () => {
+      resetGame();
+      showScreen("game");
+      initLevel();
+    });
+
+    document.getElementById("btnGoScores").addEventListener("click", async () => {
+      showScreen("scores");
+      const rows = await fetchTop10();
+      renderScores(rows);
+    });
+
+    document.getElementById("btnRefreshScores").addEventListener("click", async () => {
+      const rows = await fetchTop10();
+      renderScores(rows);
+    });
+
+    document.getElementById("btnBackHomeFromScores").addEventListener("click", () => {
+      showScreen("home");
+    });
+
+    document.getElementById("btnBackHomeFromGame").addEventListener("click", () => {
+      showScreen("home");
+    });
+
+    document.getElementById("btnBackHomeFromGameOver").addEventListener("click", () => {
+      resetGame();
+      showScreen("home");
+    });
+
+    document.getElementById("btnGoScoresFromGameOver").addEventListener("click", async () => {
+      showScreen("scores");
+      const rows = await fetchTop10();
+      renderScores(rows);
+    });
+
+    document.getElementById("btnPlayAgain").addEventListener("click", () => {
+      resetGame();
+      showScreen("game");
+      initLevel();
+    });
+
+    document.getElementById("btnShareScore").addEventListener("click", shareScore);
+
+    document.getElementById("btnSubmitScore").addEventListener("click", async () => {
+      const statusEl = document.getElementById("gameOverStatus");
+      setStatus(statusEl, null, "");
+
+      const pseudo = document.getElementById("pseudoInput").value.trim();
+      if (!isPseudoValid(pseudo)) {
+        setStatus(statusEl, "error", "Pseudo invalide (2-16 caractères : lettres/chiffres/espace/_/-).");
+        return;
+      }
+
+      try {
+        const usedApi = await submitScore(pseudo, score);
+        setStatus(
+          statusEl,
+          "ok",
+          usedApi
+            ? "Score enregistré en ligne !"
+            : "API non configurée : score enregistré en local (sur cet appareil)."
+        );
+      } catch (e) {
+        // fallback local save
+        saveLocalScore(pseudo, score);
+        setStatus(statusEl, "error", "Erreur API : score enregistré en local (fallback).");
+      }
+    });
+
+    // =============================
+    // INIT
+    // =============================
+    updateLives();
+    showScreen("home");
+    apiHealthcheck();
+  </script>
 </body>
 </html>
