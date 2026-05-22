@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forklift Master CACES 1A/1B</title>
+    <style>
+        :root {
+            --primary: #fbc531;
+            --danger: #e84118;
+            --success: #4cd137;
+            --dark: #2f3640;
+        }
+        body {
+            margin: 0;
+            background: #1e272e;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .lives { color: var(--danger); font-size: 1.2rem; }
+        .stats-top { text-align: right; font-size: 0.9rem; color: #aaa; }
+
+        /* ZONE VISUELLE */
+        .viewport {
+            height: 220px;
+            background: linear-gradient(#3d3d3d, #222);
+            border: 3px solid var(--primary);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        /* Sol */
+        .ground {
+            position: absolute;
+            bottom: 0; width: 100%; height: 30px;
+            background: #444; border-top: 2px solid #555;
+        }
+
+        /* Chariot Réaliste */
+        .chariot-body {
+            position: absolute;
+            bottom: 30px; left: 40px;
+            width: 90px; height: 60px;
+            background: var(--primary);
+            border-radius: 10px 15px 5px 5px;
+            z-index: 2;
+        }
+        .wheel {
+            position: absolute;
+            bottom: -10px; width: 25px; height: 25px;
+            background: #111; border-radius: 50%; border: 3px solid #333;
+        }
+        .w1 { left: 5px; } .w2 { right: 5px; }
+        .mast {
+            position: absolute;
+            bottom: 30px; left: 130px;
+            width: 10px; height: 160px;
+            background: #7f8c8d; border-radius: 2px;
+        }
+        /* Les Fourches */
+        .forks {
+            position: absolute;
+            bottom: 35px; left: 130px;
+            width: 100px; height: 6px;
+            background: #bdc3c7;
+            transition: 0.5s ease;
+            z-index: 3;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        .forks::before { /* Dos de la fourche */
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 6px; height: 40px;
+            background: #bdc3c7;
+        }
+        /* La Palette */
+        .palette {
+            position: absolute;
+            bottom: 6px; left: 6px;
+            background: #d35400;
+            border: 2px solid #a04000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px; font-weight: bold;
+        }
+
+        /* INFOS ET BOUTONS */
+        .mission-card {
+            background: #353b48;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .data-item {
+            background: #2f3640;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .data-item span { display: block; font-size: 0.8rem; color: #999; }
+        .data-item b { font-size: 1.1rem; color: var(--primary); }
+
+        .btn-group {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+        }
+        button {
+            padding: 18px; border: none; border-radius: 8px;
+            font-size: 1.1rem; font-weight: bold; color: white;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-ok { background: var(--success); }
+        .btn-stop { background: var(--danger); }
+        button:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="header">
+        <div class="lives" id="lifeContainer">❤️❤️❤️❤️❤️</div>
+        <div class="stats-top">
+            Score: <b id="score">0</b> | Top: <b id="topScore">0</b>
+        </div>
+    </div>
+
+    <div class="viewport">
+        <div class="ground"></div>
+        <div class="chariot-body">
+            <div class="wheel w1"></div>
+            <div class="wheel w2"></div>
+        </div>
+        <div class="mast"></div>
+        <div class="forks" id="forksUI">
+            <div class="palette" id="paletteUI"></div>
+        </div>
+    </div>
+
+    <div class="mission-card">
+        <h3 style="margin:0">ANALYSE DE CHARGE</h3>
+        <div class="data-grid">
+            <div class="data-item"><span>Poids</span><b id="valPoids">--</b></div>
+            <div class="data-item"><span>Distance (CDG)</span><b id="valDist">--</b></div>
+        </div>
+        <p style="font-size: 0.85rem; color: #ccc;">Limite Chariot : <b>600 000</b> kg.mm</p>
+        
+        <div class="btn-group">
+            <button class="btn-ok" onclick="decide(true)">VALIDER</button>
+            <button class="btn-stop" onclick="decide(false)">REFUSER</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let lives = 5;
+    let score = 0;
+    let topScore = localStorage.getItem('topCaces') || 0;
+    let limit = 600000;
+    let curP = 0;
+    let curD = 0;
+
+    document.getElementById('topScore').innerText = topScore;
+
+    function initLevel() {
+        if(lives <= 0) return gameOver();
+
+        // Nouveaux paramètres
+        curP = Math.floor(Math.random() * 1200) + 400; // 400 à 1600kg
+        curD = Math.floor(Math.random() * 800) + 400;  // 400 à 1200mm
+
+        document.getElementById('valPoids').innerText = curP + " kg";
+        document.getElementById('valDist').innerText = curD + " mm";
+        
+        // Visuel
+        const pUI = document.getElementById('paletteUI');
+        const fUI = document.getElementById('forksUI');
+        
+        pUI.style.width = (curD / 10) + "px";
+        pUI.style.height = (curP / 25) + "px";
+        pUI.innerText = curP + "kg";
+        
+        // Animation : les fourches montent un peu aléatoirement pour le style
+        fUI.style.bottom = (Math.random() * 100 + 35) + "px";
+    }
+
+    function decide(userSaysOk) {
+        let moment = curP * curD;
+        let safe = moment <= limit;
+
+        if (userSaysOk === safe) {
+            score++;
+            document.getElementById('score').innerText = score;
+        } else {
+            lives--;
+            updateLives();
+            alert(safe ? "Oups ! C'était stable." : "ACCIDENT ! Le chariot bascule !");
+        }
+
+        if(score > topScore) {
+            topScore = score;
+            localStorage.setItem('topCaces', topScore);
+            document.getElementById('topScore').innerText = topScore;
+        }
+
+        initLevel();
+    }
+
+    function updateLives() {
+        let lStr = "";
+        for(let i=0; i<5; i++) lStr += (i < lives) ? "❤️" : "🖤";
+        document.getElementById('lifeContainer').innerText = lStr;
+    }
+
+    function gameOver() {
+        alert("PARTIE TERMINÉE ! Score Final : " + score);
+        lives = 5;
+        score = 0;
+        document.getElementById('score').innerText = "0";
+        updateLives();
+        initLevel();
+    }
+
+    initLevel();
+</script>
+
+</body>
+</html>
